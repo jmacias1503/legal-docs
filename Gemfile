@@ -70,4 +70,4 @@ gem "redis", "~> 6.0"
 gem "paper_trail", "~> 17.0"
 gem "pg_search", "~> 2.4"
 
-gem "sqlite3", "~> 2.9"
+gem "sqlite3", "~> 2.10"
