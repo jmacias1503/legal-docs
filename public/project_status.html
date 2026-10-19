@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Proyecto - Digitalización y Autollenado Documental</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --pending: #64748b;
+            --border: #334155;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            color: #60a5fa;
+        }
+        p.subtitle {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .badge.completed {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .badge.in-progress {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .badge.pending {
+            background-color: rgba(100, 116, 139, 0.2);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+        ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.25rem;
+        }
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Digitalización y Autollenado Documental</h1>
+            <p class="subtitle">Estado del proyecto y seguimiento de fases (Basado en Gantt del 1 Sep al 15 Dic 2026)</p>
+        </header>
+
+        <div class="card">
+            <h2>Resumen del Proyecto y Arquitectura</h2>
+            <p><strong>Fecha de referencia:</strong> 19 de Octubre de 2026</p>
+            <p><strong>Stack Implementado:</strong> Ruby on Rails 8.1, Devise (Autenticación y Roles), Active Storage (Archivos), PaperTrail (Auditoría), Sidekiq / Solid Queue, Kamal (Despliegue).</p>
+            <p><strong>Modelos Base Creados:</strong></p>
+            <ul>
+                <li><strong>Firm:</strong> Gestión de despachos y firmas legales.</li>
+                <li><strong>User:</strong> Usuarios del sistema con roles y adscripción a despachos (vía Devise).</li>
+                <li><strong>Document:</strong> Documentos legales con metadatos JSON y soporte Active Storage.</li>
+                <li><strong>Template:</strong> Plantillas documentales por firma.</li>
+                <li><strong>Version:</strong> Control de auditoría e historial con PaperTrail.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Fases Realizadas y en Curso</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fase / Actividad</th>
+                        <th>Periodo Previsto (Gantt)</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Levantamiento de requerimientos</td>
+                        <td>1 - 15 Sep</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>Planificación de fases</td>
+                        <td>1 - 15 Sep</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>Estructura base (Rails, DB, Modelos, Devise)</td>
+                        <td>Sep</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>Asesoría</td>
+                        <td>1 Sep - 15 Dic</td>
+                        <td><span class="badge in-progress">En curso</span></td>
+                    </tr>
+                    <tr>
+                        <td>Implementar OCR</td>
+                        <td>16 Sep - 31 Oct</td>
+                        <td><span class="badge in-progress">En curso</span></td>
+                    </tr>
+                    <tr>
+                        <td>Programar módulo 1 (página/software)</td>
+                        <td>16 Sep - 31 Oct</td>
+                        <td><span class="badge in-progress">En curso</span></td>
+                    </tr>
+                    <tr>
+                        <td>Programar módulo 2 (lógica)</td>
+                        <td>16 Sep - 31 Oct</td>
+                        <td><span class="badge in-progress">En curso</span></td>
+                    </tr>
+                    <tr>
+                        <td>Testear módulo 1</td>
+                        <td>1 - 15 Nov</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Testear módulo 2</td>
+                        <td>1 - 15 Nov</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Desplegar módulo 1</td>
+                        <td>16 - 30 Nov</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Desplegar módulo 2</td>
+                        <td>16 - 30 Nov</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Entregar a cliente</td>
+                        <td>1 - 15 Dic</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cerrar contrato</td>
+                        <td>1 - 15 Dic</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mantenimiento correctivo / preventivo</td>
+                        <td>1 - 15 Dic en adelante</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Generado automáticamente para el control y seguimiento del proyecto legal-docs-aps.</p>
+        </div>
+    </div>
+</body>
+</html>
