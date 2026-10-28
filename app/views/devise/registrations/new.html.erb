@@ -1,0 +1,42 @@
+<%= content_for :title, "Crear cuenta" %>
+
+<div class="max-w-md mx-auto bg-white shadow sm:rounded-lg p-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Crear cuenta</h1>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :first_name, "Nombre", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :first_name, autofocus: true, required: true, class: input_class %>
+      </div>
+      <div>
+        <%= f.label :last_name, "Apellidos", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.text_field :last_name, required: true, class: input_class %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :email, "Correo electrónico", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.email_field :email, autocomplete: "email", required: true, class: input_class %>
+    </div>
+
+    <div>
+      <%= f.label :password, "Contraseña", class: "block text-sm font-medium text-gray-700" %>
+      <% if @minimum_password_length %>
+        <p class="text-xs text-gray-500">Mínimo <%= @minimum_password_length %> caracteres</p>
+      <% end %>
+      <%= f.password_field :password, autocomplete: "new-password", required: true, class: input_class %>
+    </div>
+
+    <div>
+      <%= f.label :password_confirmation, "Confirmar contraseña", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", required: true, class: input_class %>
+    </div>
+
+    <%= f.submit "Registrarme", class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded cursor-pointer" %>
+  <% end %>
+
+  <p class="mt-4 text-sm text-center"><%= link_to "Ya tengo cuenta", new_session_path(resource_name), class: "text-blue-600 underline" %></p>
+</div>

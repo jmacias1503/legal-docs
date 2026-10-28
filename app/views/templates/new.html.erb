@@ -1,0 +1,14 @@
+<%= content_for :title, 'Nueva Plantilla' %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Nueva Plantilla</h1>
+    <div class="flex space-x-4">
+      <%= link_to 'Regresar', templates_path, class: 'bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded' %>
+    </div>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+    <%= render 'form', template: @template %>
+  </div>
+</div>

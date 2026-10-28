@@ -1,0 +1,41 @@
+<%= content_for :title, "API REST" %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  <h1 class="text-2xl font-bold text-gray-900">Integración por API REST</h1>
+
+  <section class="bg-white shadow sm:rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-medium text-gray-900">Tu token</h2>
+    <% if @token %>
+      <div class="bg-yellow-50 border border-yellow-300 text-yellow-900 px-4 py-3 rounded text-sm space-y-2">
+        <p>Copia este token ahora; no se volverá a mostrar.</p>
+        <code class="block font-mono break-all bg-white p-2 rounded border"><%= @token %></code>
+      </div>
+    <% elsif current_user.api_token_digest? %>
+      <p class="text-sm text-gray-600">Tienes un token activo. Si lo perdiste, genera uno nuevo (el anterior dejará de funcionar).</p>
+    <% else %>
+      <p class="text-sm text-gray-600">Aún no tienes un token.</p>
+    <% end %>
+    <div class="flex flex-wrap gap-3">
+      <%= button_to (current_user.api_token_digest? ? "Generar nuevo token" : "Generar token"), api_token_path, class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <% if current_user.api_token_digest? %>
+        <%= button_to "Revocar token", api_token_path, method: :delete, class: "bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="bg-white shadow sm:rounded-lg p-6 space-y-3 text-sm text-gray-800">
+    <h2 class="text-lg font-medium text-gray-900">Uso</h2>
+    <p>Envía el token en el encabezado <code>Authorization: Bearer &lt;token&gt;</code>. Solo se accede a la información de tu despacho y cada operación queda en la bitácora a tu nombre.</p>
+    <table class="min-w-full">
+      <tbody class="divide-y divide-gray-100 font-mono text-xs">
+        <tr><td class="py-2 pr-4">GET /api/v1/documents</td><td class="py-2 font-sans">Lista (filtros: q, client, procedure_type, status, from, to, page)</td></tr>
+        <tr><td class="py-2 pr-4">GET /api/v1/documents/:id</td><td class="py-2 font-sans">Detalle con texto OCR y datos detectados</td></tr>
+        <tr><td class="py-2 pr-4">POST /api/v1/documents</td><td class="py-2 font-sans">Crea un documento (multipart con <code>document[file]</code> para OCR)</td></tr>
+        <tr><td class="py-2 pr-4">PATCH /api/v1/documents/:id</td><td class="py-2 font-sans">Actualiza datos; <code>metadata</code> se combina con lo existente</td></tr>
+        <tr><td class="py-2 pr-4">GET /api/v1/documents/:id/fill?template_id=</td><td class="py-2 font-sans">Autollenado: texto, campos faltantes e inválidos</td></tr>
+        <tr><td class="py-2 pr-4">GET /api/v1/templates</td><td class="py-2 font-sans">Plantillas disponibles y sus marcadores</td></tr>
+      </tbody>
+    </table>
+    <pre class="bg-gray-50 p-3 rounded text-xs overflow-x-auto">curl -H "Authorization: Bearer $TOKEN" <%= api_v1_documents_url %>?status=validated</pre>
+  </section>
+</div>

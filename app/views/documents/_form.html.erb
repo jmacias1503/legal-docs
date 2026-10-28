@@ -1,0 +1,65 @@
+<%= form_with(model: document, class: "space-y-6") do |form| %>
+  <% if document.errors.any? %>
+    <div class="bg-red-50 p-4 rounded-lg">
+      <h2 class="text-sm font-medium text-red-800">No se pudo guardar el documento:</h2>
+      <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+        <% document.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="space-y-4">
+      <div>
+        <%= form.label :title, "Título", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :title, required: true, class: input_class %>
+      </div>
+      <div>
+        <%= form.label :client, "Cliente", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :client, class: input_class %>
+      </div>
+      <div>
+        <%= form.label :procedure_type, "Tipo de trámite", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :procedure_type, placeholder: "Ej. Arrendamiento, Poder notarial, Compraventa", class: input_class %>
+      </div>
+      <div>
+        <%= form.label :file, "Archivo escaneado (PDF, imagen, Word o texto)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.file_field :file, accept: Document::ACCEPTED_FILE_TYPES.join(","), class: "mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+        <p class="mt-1 text-xs text-gray-500">Al subir un archivo se ejecuta el OCR y se detectan los datos automáticamente.</p>
+        <% if document.file.attached? %>
+          <p class="mt-2 text-sm text-gray-700">Archivo actual: <strong><%= document.file.filename %></strong> (<%= number_to_human_size(document.file.byte_size) %>)</p>
+        <% end %>
+      </div>
+    </div>
+
+    <% if document.persisted? %>
+      <fieldset class="space-y-3">
+        <legend class="text-sm font-medium text-gray-700">Datos del documento</legend>
+        <p class="text-xs text-gray-500">Corrige los datos detectados. Deja un campo vacío para eliminarlo.</p>
+        <% (LegalFields.keys | document.metadata.to_h.keys).each do |key| %>
+          <div>
+            <%= label_tag "document_metadata_#{key}", LegalFields.label(key), class: "block text-xs font-medium text-gray-600" %>
+            <%= text_field_tag "document[metadata][#{key}]", document.metadata.to_h[key], id: "document_metadata_#{key}", class: input_class %>
+          </div>
+        <% end %>
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t">
+          <div>
+            <%= form.label :new_field_key, "Campo adicional", class: "block text-xs font-medium text-gray-600" %>
+            <%= form.text_field :new_field_key, placeholder: "ej. precio_renta", class: input_class %>
+          </div>
+          <div>
+            <%= form.label :new_field_value, "Valor", class: "block text-xs font-medium text-gray-600" %>
+            <%= form.text_field :new_field_value, class: input_class %>
+          </div>
+        </div>
+      </fieldset>
+    <% end %>
+  </div>
+
+  <div class="flex justify-end space-x-4">
+    <%= form.submit "Guardar", class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded cursor-pointer" %>
+    <%= link_to "Cancelar", document.persisted? ? document : documents_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded" %>
+  </div>
+<% end %>

@@ -4,4 +4,17 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  before_action :configure_permitted_parameters, if: :devise_controller?
+  # RF-06: registra en la bitácora qué usuario hizo cada cambio.
+  before_action :set_paper_trail_whodunnit
+
+  private
+
+  def current_firm = current_user.firm
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: %i[first_name last_name])
+    devise_parameter_sanitizer.permit(:account_update, keys: %i[first_name last_name])
+  end
 end

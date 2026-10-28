@@ -1,15 +1,26 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  title: MyString
+lease:
+  title: Arrendamiento Pérez
+  client: Juan Pérez
+  procedure_type: Arrendamiento
   firm: one
   user: one
-  status: 1
-  metadata: 
+  status: 2
+  extracted_text: Contrato con domicilio en Av. Universidad 100
+  metadata: <%= { "nombre" => "JUAN PEREZ LOPEZ", "rfc" => "PELJ800101AB1", "monto" => "$12,500.00" }.to_json %>
 
-two:
-  title: MyString
+power:
+  title: Poder Gómez
+  client: María Gómez
+  procedure_type: Poder notarial
+  firm: one
+  user: one
+  status: 0
+  metadata: <%= {}.to_json %>
+
+other_firm:
+  title: Expediente ajeno
+  client: Cliente Dos
   firm: two
   user: two
-  status: 1
-  metadata: 
+  status: 0
+  metadata: <%= {}.to_json %>

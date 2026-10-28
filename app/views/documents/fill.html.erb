@@ -1,0 +1,33 @@
+<%= content_for :title, "Autollenado: #{@template.name}" %>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  <div class="flex flex-wrap gap-4 justify-between items-center print:hidden">
+    <h1 class="text-2xl font-bold text-gray-900"><%= @template.name %> · <%= @document.title %></h1>
+    <div class="flex flex-wrap gap-3">
+      <% if @result.complete? %>
+        <%= button_to "Emitir con sello (PDF + QR)", issue_document_path(@document, template_id: @template.id), class: "bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <% end %>
+      <%= link_to "Descargar PDF", fill_document_path(@document, template_id: @template.id, format: :pdf), class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <%= link_to "Descargar Word", fill_document_path(@document, template_id: @template.id, format: :docx), class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <%= link_to "Descargar .txt", fill_document_path(@document, template_id: @template.id, format: :text), class: "bg-blue-100 hover:bg-blue-200 text-blue-900 text-sm font-medium py-2 px-4 rounded" %>
+      <button type="button" onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-sm font-medium py-2 px-4 rounded">Imprimir</button>
+      <%= link_to "Regresar", @document, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium py-2 px-4 rounded" %>
+    </div>
+  </div>
+
+  <% unless @result.complete? %>
+    <div class="bg-yellow-50 border border-yellow-300 text-yellow-900 px-4 py-3 rounded text-sm print:hidden">
+      <% if @result.missing.any? %>
+        <p><strong>Campos faltantes:</strong> <%= @result.missing.map { |key| LegalFields.label(key) }.to_sentence %>.
+        <%= link_to "Completar datos", edit_document_path(@document), class: "underline" %></p>
+      <% end %>
+      <% @result.invalid.each do |message| %>
+        <p><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <article class="bg-white shadow sm:rounded-lg p-8 print:shadow-none">
+    <div class="whitespace-pre-wrap font-serif text-gray-900 leading-relaxed"><%= @result.text %></div>
+  </article>
+</div>

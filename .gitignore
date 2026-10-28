@@ -34,3 +34,7 @@ vendor/
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+
+# Presentación (Slidev): dependencias y salida de compilación
+/slides/node_modules
+/slides/dist

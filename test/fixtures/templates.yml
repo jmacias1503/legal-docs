@@ -1,9 +1,14 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  name: MyString
+lease:
+  name: Arrendamiento del despacho
   firm: one
+  body: "Arrendador {{nombre}} con RFC {{rfc}} paga {{renta}} el {{fecha}}."
+  field_mappings: <%= { "renta" => "monto" }.to_json %>
 
-two:
-  name: MyString
+library:
+  name: Carta poder (biblioteca)
+  body: "Yo, {{nombre}}, otorgo poder."
+
+other_firm:
+  name: Plantilla ajena
   firm: two
+  body: "{{nombre}}"

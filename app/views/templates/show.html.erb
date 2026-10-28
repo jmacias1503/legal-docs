@@ -1,0 +1,43 @@
+<%= content_for :title, @template.name %>
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+  <div class="flex flex-wrap gap-4 justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @template.name %></h1>
+      <p class="text-sm text-gray-500"><%= @template.library? ? "Biblioteca legal (solo lectura)" : "Plantilla de mi despacho" %></p>
+    </div>
+    <div class="flex gap-3">
+      <% unless @template.library? %>
+        <%= link_to "Editar", edit_template_path(@template), class: "bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <% end %>
+      <%= link_to "Regresar", templates_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium py-2 px-4 rounded" %>
+    </div>
+  </div>
+
+  <section class="bg-white shadow sm:rounded-lg p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Marcadores</h2>
+    <% if @template.placeholders.any? %>
+      <ul class="flex flex-wrap gap-2">
+        <% @template.placeholders.each do |placeholder| %>
+          <li class="text-xs font-mono bg-gray-100 rounded px-2 py-1">
+            {{<%= placeholder %>}}
+            <% source = @template.source_for(placeholder) %>
+            <% if source != placeholder %>→ <%= LegalFields.label(source) %><% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% elsif @template.body.blank? && @template.file.attached? %>
+      <p class="text-sm text-gray-500">Extrayendo texto del archivo… <%= link_to "Actualizar", @template, class: "underline" %>.</p>
+    <% else %>
+      <p class="text-sm text-gray-500">Esta plantilla no tiene marcadores <code>{{campo}}</code>.</p>
+    <% end %>
+  </section>
+
+  <section class="bg-white shadow sm:rounded-lg p-6">
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Cuerpo</h2>
+    <pre class="text-sm text-gray-800 whitespace-pre-wrap font-serif"><%= @template.body.presence || "—" %></pre>
+    <% if @template.file.attached? %>
+      <p class="mt-4 text-sm">Formato original: <%= link_to @template.file.filename, rails_blob_path(@template.file, disposition: "attachment"), class: "text-blue-600 underline" %></p>
+    <% end %>
+  </section>
+</div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado del Proyecto - Digitalización y Autollenado Documental</title>
+    <title>Estado del Proyecto - DigitalLaw (Digitalización y Autollenado Documental)</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -112,21 +112,22 @@
 <body>
     <div class="container">
         <header>
-            <h1>Digitalización y Autollenado Documental</h1>
-            <p class="subtitle">Estado del proyecto y seguimiento de fases (Basado en Gantt del 1 Sep al 15 Dic 2026)</p>
+            <h1>DigitalLaw - Digitalización y Autollenado Documental</h1>
+            <p class="subtitle">Estado del proyecto, alineación con SRS & Canvas y seguimiento de fases (Equipo Threno)</p>
         </header>
 
         <div class="card">
-            <h2>Resumen del Proyecto y Arquitectura</h2>
-            <p><strong>Fecha de referencia:</strong> 19 de Octubre de 2026</p>
-            <p><strong>Stack Implementado:</strong> Ruby on Rails 8.1, Devise (Autenticación y Roles), Active Storage (Archivos), PaperTrail (Auditoría), Sidekiq / Solid Queue, Kamal (Despliegue).</p>
+            <h2>Resumen, Arquitectura y Alineación SRS / Canvas</h2>
+            <p><strong>Fecha de referencia:</strong> 26 de Octubre de 2026</p>
+            <p><strong>Equipo:</strong> Threno (UAQ) | <strong>Segmentos:</strong> Despachos Jurídicos, Notarías Públicas, Administradores.</p>
+            <p><strong>Stack Implementado:</strong> Ruby on Rails 8.1, Devise (Autenticación), Active Storage, PaperTrail (Audit Log / RF-06), `pg_search`, Sidekiq / Solid Queue, Kamal (Despliegue).</p>
             <p><strong>Modelos Base Creados:</strong></p>
             <ul>
                 <li><strong>Firm:</strong> Gestión de despachos y firmas legales.</li>
                 <li><strong>User:</strong> Usuarios del sistema con roles y adscripción a despachos (vía Devise).</li>
                 <li><strong>Document:</strong> Documentos legales con metadatos JSON y soporte Active Storage.</li>
-                <li><strong>Template:</strong> Plantillas documentales por firma.</li>
-                <li><strong>Version:</strong> Control de auditoría e historial con PaperTrail.</li>
+                <li><strong>Template:</strong> Plantillas documentales por firma (RF-05).</li>
+                <li><strong>Version:</strong> Control de auditoría e historial inmutable con PaperTrail (RF-06).</li>
             </ul>
         </div>
 
@@ -142,7 +143,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Levantamiento de requerimientos</td>
+                        <td>Levantamiento de requerimientos (SRS & Canvas)</td>
                         <td>1 - 15 Sep</td>
                         <td><span class="badge completed">Completado</span></td>
                     </tr>
@@ -152,34 +153,29 @@
                         <td><span class="badge completed">Completado</span></td>
                     </tr>
                     <tr>
-                        <td>Estructura base (Rails, DB, Modelos, Devise)</td>
-                        <td>Sep</td>
+                        <td>Asesoría</td>
+                        <td>1 - 30 Sep</td>
                         <td><span class="badge completed">Completado</span></td>
                     </tr>
                     <tr>
-                        <td>Asesoría</td>
-                        <td>1 Sep - 15 Dic</td>
-                        <td><span class="badge in-progress">En curso</span></td>
+                        <td>Implementar OCR (RF-01)</td>
+                        <td>16 - 30 Sep</td>
+                        <td><span class="badge completed">Completado</span></td>
                     </tr>
                     <tr>
-                        <td>Implementar OCR</td>
-                        <td>16 Sep - 31 Oct</td>
-                        <td><span class="badge in-progress">En curso</span></td>
+                        <td>Programar módulo 1: página/software (RF-05, RF-06, RF-07)</td>
+                        <td>1 - 31 Oct</td>
+                        <td><span class="badge completed">Completado</span></td>
                     </tr>
                     <tr>
-                        <td>Programar módulo 1 (página/software)</td>
-                        <td>16 Sep - 31 Oct</td>
-                        <td><span class="badge in-progress">En curso</span></td>
-                    </tr>
-                    <tr>
-                        <td>Programar módulo 2 (lógica)</td>
-                        <td>16 Sep - 31 Oct</td>
-                        <td><span class="badge in-progress">En curso</span></td>
+                        <td>Programar módulo 2: lógica de autollenado (RF-02)</td>
+                        <td>1 - 31 Oct</td>
+                        <td><span class="badge completed">Completado</span></td>
                     </tr>
                     <tr>
                         <td>Testear módulo 1</td>
-                        <td>1 - 15 Nov</td>
-                        <td><span class="badge pending">Pendiente</span></td>
+                        <td>16 - 31 Oct</td>
+                        <td><span class="badge in-progress">En curso</span></td>
                     </tr>
                     <tr>
                         <td>Testear módulo 2</td>
@@ -188,7 +184,7 @@
                     </tr>
                     <tr>
                         <td>Desplegar módulo 1</td>
-                        <td>16 - 30 Nov</td>
+                        <td>1 - 15 Nov</td>
                         <td><span class="badge pending">Pendiente</span></td>
                     </tr>
                     <tr>
@@ -198,17 +194,22 @@
                     </tr>
                     <tr>
                         <td>Entregar a cliente</td>
-                        <td>1 - 15 Dic</td>
+                        <td>16 - 30 Nov</td>
                         <td><span class="badge pending">Pendiente</span></td>
                     </tr>
                     <tr>
                         <td>Cerrar contrato</td>
+                        <td>16 Nov - 15 Dic</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mantenimiento correctivo</td>
                         <td>1 - 15 Dic</td>
                         <td><span class="badge pending">Pendiente</span></td>
                     </tr>
                     <tr>
-                        <td>Mantenimiento correctivo / preventivo</td>
-                        <td>1 - 15 Dic en adelante</td>
+                        <td>Mantenimiento preventivo</td>
+                        <td>1 - 15 Dic</td>
                         <td><span class="badge pending">Pendiente</span></td>
                     </tr>
                 </tbody>
@@ -216,7 +217,7 @@
         </div>
 
         <div class="footer">
-            <p>Generado automáticamente para el control y seguimiento del proyecto legal-docs-aps.</p>
+            <p>Generado automáticamente para el control y seguimiento del proyecto DigitalLaw (legal-docs-aps).</p>
         </div>
     </div>
 </body>

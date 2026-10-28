@@ -1,15 +1,33 @@
 Rails.application.routes.draw do
   devise_for :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  resources :documents do
+    member do
+      post :reprocess
+      patch :confirm
+      get :fill
+      post :issue
+    end
+  end
+  resources :templates
+  resource :subscription, only: %i[show update]
+  resource :api_token, only: %i[show create destroy]
+
+  # RF-03: verificación pública de documentos emitidos (destino del QR).
+  get "verificar/:token" => "verifications#show", as: :verification
+  post "verificar/:token" => "verifications#create"
+
+  # RNF-06
+  namespace :api do
+    namespace :v1 do
+      resources :documents, only: %i[index show create update] do
+        get :fill, on: :member
+      end
+      resources :templates, only: %i[index show]
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+  root "documents#index"
 end
