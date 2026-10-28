@@ -70,7 +70,7 @@ gem "redis", "~> 6.0"
 gem "paper_trail", "~> 17.0"
 gem "pg_search", "~> 2.4"
 
-gem "sqlite3", "~> 2.9"
+gem "sqlite3", "~> 2.10"
 
 # json 3.x quitó el hash posicional de JSON.parse que usa ActiveSupport 8.1 (rompe columnas JSON).
 gem "json", "~> 2.16"
