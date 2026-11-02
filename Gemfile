@@ -77,4 +77,4 @@ gem "json", "~> 2.16"
 
 gem "prawn", "~> 2.4"
 gem "rqrcode", "~> 3.2"
-gem "rubyzip", "~> 3.6"
+gem "rubyzip", "~> 3.7"
