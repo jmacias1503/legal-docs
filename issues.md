@@ -29,12 +29,14 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 | #19 Bitácora de accesos (RF-06) | ✅ Consultas, descargas, validación y emisión | `Document#log_event!` |
 | #12 – #15 | ⏳ Pendientes según Gantt (noviembre – diciembre) | |
 | #20 Autollenado sobre el Word original (RF-02, RF-05) | ✅ Hecho: llena el .docx original (cuerpo, encabezados, pies, notas), con respaldo al Word genérico si el archivo está dañado o excede límites. Limitación: los marcadores que solo existen en el Word no se pueden mapear en el formulario (solo se listan los del cuerpo) | `app/services/template_filler.rb` |
-| #21 Pruebas de aceptación módulo 2 | ⏳ Pendiente: listo para iniciar (#20 hecho) | `test/` |
+| #21 Pruebas de aceptación módulo 2 | ✅ Hecho | `test/integration/autofill_acceptance_test.rb` |
 | #22 Configuración de producción (PostgreSQL, S3, Solid Queue) | ✅ Hecho (configuración lista); falta probar contra un PostgreSQL real antes del primer despliegue | `config/`, `db/*_schema.rb` |
 | #23 Kamal: servidor, registro, dominio y host público | ⏳ Bloqueado: faltan servidor, registro y dominio | `config/deploy.yml` |
-| #24 Respaldos automáticos (RNF-05) | ⏳ Pendiente: listo para iniciar (#22 hecho) | |
+| #24 Respaldos automáticos (RNF-05) | ✅ Hecho; faltan pruebas reales contra PostgreSQL y configurar el bucket | `app/jobs/database_backup_job.rb` |
 | #25 Pasarela de pago y facturación CFDI (RF-04) | ⏳ Pendiente de decisión de negocio/proveedor | |
 | #26 Firma electrónica avanzada FIEL/DocuSign (RF-03) | ⏳ Pendiente de decisión de negocio/proveedor | |
+| #27 Límite de tamaño en la verificación pública (RNF-01) | ⏳ Pendiente | `VerificationsController#create` |
+| #28 Datos del cliente en el nombre de la plantilla emitida (RNF-01, LFPDPPP) | ⏳ Pendiente | `/verificar/:token` |
 
 > Nota: la prueba manual del módulo 1 con expedientes reales (#8) la hace el equipo.
 
@@ -185,7 +187,8 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **SRS**: RF-02
 - **Prioridad**: Alta
 - **Estimación**: Por definir
-- **Estado**: ⏳ Pendiente: listo para iniciar
+- **Estado**: ✅ Hecho
+- **Entregado**: 14 pruebas de integración en `test/integration/autofill_acceptance_test.rb`. Sin cubrir: el contenido del PDF (no hay gema para leer PDF).
 - **Dependencias**: Issue #20 (Autollenado sobre el Word original), ya hecho.
 
 ### Issue #22: Configuración de Producción
@@ -214,7 +217,13 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **SRS**: RNF-05 (Respaldos)
 - **Prioridad**: Media
 - **Estimación**: Por definir
-- **Estado**: ⏳ Pendiente: listo para iniciar
+- **Estado**: ✅ Hecho
+- **Entregado**: job diario a las 3:00 UTC (`app/jobs/database_backup_job.rb`) que ejecuta `pg_dump` y sube el respaldo a S3 (`backups/`); restauración y retención documentadas en el README.
+- **Pendientes**:
+  - Probar un respaldo y una restauración reales contra PostgreSQL antes del primer despliegue (`pg_dump` no está instalado en desarrollo).
+  - Configurar la regla de ciclo de vida (~30 días) y el versionado del bucket.
+  - El cliente `pg_dump` de la imagen es PG 17: el servidor debe ser ≤ 17.
+  - Límite de 5 GB por subida simple.
 - **Dependencias**: Issue #22 (Configuración de producción), ya hecho.
 
 ### Issue #25: Pasarela de Pago y Facturación CFDI
@@ -232,3 +241,19 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **Estimación**: Por definir
 - **Estado**: ⏳ Pendiente de decisión de negocio/proveedor
 - **Dependencias**: Decisión de negocio y de proveedor.
+
+### Issue #27: Límite de Tamaño en la Verificación Pública
+- **Descripción**: `VerificationsController#create` (`/verificar/:token`, subida pública sin sesión) lee el archivo completo sin límite de tamaño. Hay límite de 20 peticiones por minuto, pero no de tamaño. Rechazar archivos mayores a unos MB.
+- **SRS**: RNF-01 (Seguridad)
+- **Prioridad**: Media
+- **Estimación**: Por definir
+- **Estado**: ⏳ Pendiente
+- **Dependencias**: Ninguna.
+
+### Issue #28: Datos del Cliente en el Nombre de la Plantilla Emitida
+- **Descripción**: La página pública `/verificar/:token` muestra el nombre de la plantilla (texto libre escrito por el despacho), que podría contener datos de un cliente. Decidir si se muestra solo para plantillas de la biblioteca o si se advierte al despacho.
+- **SRS**: RNF-01 (Seguridad), LFPDPPP
+- **Prioridad**: Media
+- **Estimación**: Por definir
+- **Estado**: ⏳ Pendiente
+- **Dependencias**: Ninguna.
