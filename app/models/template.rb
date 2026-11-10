@@ -16,6 +16,8 @@ class Template < ApplicationRecord
 
   def library? = firm_id.nil?
 
+  def docx_file? = file.attached? && file.content_type == OcrExtractor::DOCX
+
   def placeholders = body.to_s.scan(PLACEHOLDER).flatten.map(&:downcase).uniq
 
   # RF-05: cada marcador puede tomar su valor de otro campo del documento.

@@ -78,7 +78,11 @@ class DocumentsController < ApplicationController
       format.html
       format.text { send_filled(@result.text, "txt", "text/plain; charset=utf-8") }
       format.pdf { send_filled(DocumentExport.pdf(@result.text, title: @document.title), "pdf", "application/pdf") }
-      format.docx { send_filled(DocumentExport.docx(@result.text), "docx", DocumentExport::DOCX) }
+      format.docx do
+        # Con un Word adjunto se llena el original (conserva formato); si no, se genera uno desde el texto.
+        data = TemplateFiller.docx(@template, @document) || DocumentExport.docx(@result.text)
+        send_filled(data, "docx", DocumentExport::DOCX)
+      end
     end
   end
 

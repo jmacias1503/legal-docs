@@ -27,6 +27,9 @@
   <div>
     <%= form.label :body, "Cuerpo del formato", class: "block text-sm font-medium text-gray-700" %>
     <p class="text-xs text-gray-500">Usa marcadores como <code>{{nombre}}</code>, <code>{{rfc}}</code>, <code>{{fecha}}</code>, <code>{{cliente}}</code> o <code>{{fecha_actual}}</code>.</p>
+    <% if template.docx_file? %>
+      <p class="text-xs text-amber-700">La descarga en Word usa el archivo original; los cambios al cuerpo solo afectan la vista previa, el PDF y el .txt.</p>
+    <% end %>
     <%= form.text_area :body, rows: 16, class: "#{input_class} font-mono" %>
   </div>
 

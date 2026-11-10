@@ -133,6 +133,49 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "download", documents(:lease).versions.last.event
   end
 
+  test "downloads the filled original when the template file is a Word document" do
+    docx = Zip::OutputStream.write_buffer(StringIO.new) do |zip|
+      zip.put_next_entry("word/document.xml")
+      zip.write %(<w:document xmlns:w="#{OcrExtractor::WORD_NS['w']}"><w:body><w:p><w:r><w:t>Yo {{nom</w:t></w:r><w:r><w:t>bre}} el {{fecha}}</w:t></w:r></w:p></w:body></w:document>)
+    end.string
+    template = templates(:lease)
+    template.file.attach(io: StringIO.new(docx), filename: "plantilla.docx", content_type: OcrExtractor::DOCX)
+
+    get fill_document_path(documents(:lease), template_id: template.id, format: :docx)
+
+    assert_equal DocumentExport::DOCX, response.media_type
+    xml = Zip::File.open_buffer(StringIO.new(response.body)).read("word/document.xml").force_encoding("UTF-8")
+    assert_includes xml, "Yo JUAN PEREZ LOPEZ"
+    assert_includes xml, "[FECHA]"
+    assert_no_match "{{", xml
+  end
+
+  test "falls back to the generated Word when the attached docx is corrupt" do
+    template = templates(:lease)
+    template.file.attach(io: StringIO.new("no es un zip"), filename: "plantilla.docx", content_type: OcrExtractor::DOCX)
+
+    get fill_document_path(documents(:lease), template_id: template.id, format: :docx)
+
+    assert_response :success
+    assert_equal DocumentExport::DOCX, response.media_type
+    assert response.body.start_with?("PK")
+  end
+
+  test "does not issue when a placeholder only in the docx header is missing" do
+    docx = Zip::OutputStream.write_buffer(StringIO.new) do |zip|
+      zip.put_next_entry("word/header1.xml")
+      zip.write %(<w:hdr xmlns:w="#{OcrExtractor::WORD_NS['w']}"><w:p><w:r><w:t>Tel {{telefono}}</w:t></w:r></w:p></w:hdr>)
+    end.string
+    template = templates(:lease)
+    template.file.attach(io: StringIO.new(docx), filename: "plantilla.docx", content_type: OcrExtractor::DOCX)
+    documents(:lease).update!(metadata: documents(:lease).metadata.merge("fecha" => "01/02/2026"))
+
+    assert_no_difference("IssuedDocument.count") do
+      post issue_document_path(documents(:lease), template_id: template.id)
+    end
+    assert_redirected_to fill_document_path(documents(:lease), template_id: template.id)
+  end
+
   test "issues a sealed PDF whose hash can be verified publicly" do
     assert_difference("IssuedDocument.count", 1) do
       post issue_document_path(documents(:lease), template_id: templates(:library).id)
