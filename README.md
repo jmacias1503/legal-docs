@@ -39,7 +39,7 @@ Según el Gantt, los módulos 1 y 2 están programados y la fase actual es **Tes
 - Plantillas propias del despacho (escritas a mano o extraídas de un PDF/Word) con marcadores `{{campo}}`, y mapeo de cada marcador a otro campo del documento.
 - Biblioteca legal compartida, de solo lectura: contrato de arrendamiento, carta poder simple y escrito de promoción.
 - Vista previa del autollenado con los campos faltantes marcados como `[CAMPO]`. Descarga en PDF, Word o `.txt`.
-- **Emisión con sello:** genera un PDF definitivo con folio y QR y guarda su huella SHA-256. La página pública `/verificar/:folio` (sin sesión) muestra el despacho, el formato y la fecha, sin datos del cliente, y compara cualquier copia subida contra la huella. Solo se emite cuando no faltan datos y todos son válidos.
+- **Emisión con sello:** genera un PDF definitivo con folio y QR y guarda su huella SHA-256. La página pública `/verificar/:folio` (sin sesión) muestra el despacho, el formato (solo si es de la biblioteca legal; los formatos del despacho aparecen como "Formato personalizado del despacho") y la fecha, sin datos del cliente, y compara cualquier copia subida contra la huella. Solo se emite cuando no faltan datos y todos son válidos.
 
 **Despachos, usuarios y suscripción**
 - Cada usuario pertenece a un despacho y solo ve la información de su despacho. Quien se registra recibe un despacho propio y queda como administrador.

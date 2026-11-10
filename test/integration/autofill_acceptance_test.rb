@@ -209,6 +209,7 @@ class AutofillAcceptanceTest < ActionDispatch::IntegrationTest
     assert_match(/\A\h{64}\z/, issued.sha256)
     assert_equal Digest::SHA256.hexdigest(pdf), issued.sha256
     assert_equal "Contrato de arrendamiento", issued.template_name
+    assert issued.library_template?
 
     sign_out :user
     get verification_path(issued.token)
@@ -221,6 +222,7 @@ class AutofillAcceptanceTest < ActionDispatch::IntegrationTest
 
     post verification_path(issued.token), params: { file: upload(pdf) }
     assert_match "no ha sido alterado", response.body
+    assert_match "Contrato de arrendamiento", response.body
     private_data_list.each { |private_data| assert_no_match private_data, response.body }
 
     post verification_path(issued.token), params: { file: upload(pdf + "x") }
@@ -237,6 +239,27 @@ class AutofillAcceptanceTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     post verification_path("token-inexistente"), params: { file: upload(pdf) }
     assert_response :not_found
+  end
+
+  test "the public page hides the name of a firm template but the firm still sees it" do
+    template = firms(:one).templates.create!(name: "Contrato Juan Pérez", body: "Yo {{nombre}}.")
+    post issue_document_path(@document, template_id: template.id)
+    issued = @document.issued_documents.last
+    assert_equal "Contrato Juan Pérez", issued.template_name
+    assert_not issued.library_template?
+
+    get document_path(@document)
+    assert_match "Contrato Juan Pérez", response.body
+
+    sign_out :user
+    get verification_path(issued.token)
+    assert_response :success
+    assert_match "Formato personalizado del despacho", response.body
+    assert_no_match "Juan Pérez", response.body
+
+    post verification_path(issued.token), params: { file: upload(issued.file.download) }
+    assert_match "Formato personalizado del despacho", response.body
+    assert_no_match "Juan Pérez", response.body
   end
 
   test "a user from another firm cannot fill or see documents and templates of this firm" do
