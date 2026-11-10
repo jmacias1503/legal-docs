@@ -34,6 +34,17 @@ class DocumentTest < ActiveSupport::TestCase
     assert_not_includes firm_docs.filter_by(q: "%"), plain
   end
 
+  test "ignores non-string filter params instead of raising" do
+    firm_docs = firms(:one).documents
+    total = firm_docs.count
+
+    [ [ "x" ], { "a" => "b" } ].each do |value|
+      %i[q client procedure_type status from to].each do |key|
+        assert_equal total, firm_docs.filter_by(key => value).count, "#{key} con #{value.class}"
+      end
+    end
+  end
+
   test "exposes document attributes and metadata for autofill" do
     values = documents(:lease).field_values
 

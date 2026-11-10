@@ -18,6 +18,15 @@ class Api::V1::DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "Arrendamiento Pérez" ], titles
   end
 
+  test "non-scalar page params fall back to page 1" do
+    [ "page[]=1", "page[a]=1" ].each do |query|
+      get "#{api_v1_documents_path}?#{query}", headers: @headers
+
+      assert_response :success
+      assert_equal 1, response.parsed_body["page"]
+    end
+  end
+
   test "shows a document and logs the access" do
     get api_v1_document_path(documents(:lease)), headers: @headers
 

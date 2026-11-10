@@ -7,7 +7,8 @@ module Api
 
       # Acepta los mismos filtros que la vista web (RF-07): q, client, procedure_type, status, from, to.
       def index
-        page = [ params[:page].to_i, 1 ].max
+        page = params[:page]
+        page = [ page.is_a?(String) ? page.to_i : 1, 1 ].max
         documents = current_firm.documents.filter_by(params).order(created_at: :desc).limit(PER_PAGE).offset((page - 1) * PER_PAGE)
         render json: { page:, per_page: PER_PAGE, documents: documents.map { |document| document_json(document) } }
       end

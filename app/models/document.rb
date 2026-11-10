@@ -41,21 +41,34 @@ class Document < ApplicationRecord
   # RF-07: búsqueda por texto y filtros por metadatos.
   def self.filter_by(params)
     scope = all
-    if params[:q].present?
+    q = text_param(params[:q])
+    client = text_param(params[:client])
+    procedure_type = text_param(params[:procedure_type])
+    status = text_param(params[:status])
+    from = text_param(params[:from])
+    to = text_param(params[:to])
+
+    if q
       # Arel `matches` genera ILIKE en PostgreSQL y LIKE en SQLite (ambos sin distinguir mayúsculas).
       scope = scope.where(
-        contains(:title, params[:q])
-          .or(contains(:client, params[:q]))
-          .or(contains(:extracted_text, params[:q]))
+        contains(:title, q)
+          .or(contains(:client, q))
+          .or(contains(:extracted_text, q))
       )
     end
-    scope = scope.where(contains(:client, params[:client])) if params[:client].present?
-    scope = scope.where(procedure_type: params[:procedure_type]) if params[:procedure_type].present?
-    scope = scope.where(status: params[:status]) if params[:status].present? && statuses.key?(params[:status])
-    scope = scope.where(created_at: Date.parse(params[:from]).beginning_of_day..) if valid_date?(params[:from])
-    scope = scope.where(created_at: ..Date.parse(params[:to]).end_of_day) if valid_date?(params[:to])
+    scope = scope.where(contains(:client, client)) if client
+    scope = scope.where(procedure_type: procedure_type) if procedure_type
+    scope = scope.where(status: status) if status && statuses.key?(status)
+    scope = scope.where(created_at: Date.parse(from).beginning_of_day..) if valid_date?(from)
+    scope = scope.where(created_at: ..Date.parse(to).end_of_day) if valid_date?(to)
     scope
   end
+
+  # Solo se aceptan cadenas no vacías; arreglos/hashes (`q[]=x`) se ignoran como si no vinieran.
+  def self.text_param(value)
+    value.is_a?(String) && value.present? ? value : nil
+  end
+  private_class_method :text_param
 
   def self.valid_date?(value)
     value.present? && Date.parse(value)
