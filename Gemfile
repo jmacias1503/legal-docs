@@ -65,12 +65,16 @@ group :test do
 end
 
 gem "devise", "~> 5.0"
-gem "sidekiq", "~> 8.1"
-gem "redis", "~> 6.0"
 gem "paper_trail", "~> 17.0"
 gem "pg_search", "~> 2.4"
 
 gem "sqlite3", "~> 2.9"
+
+# Producción (SRS RNF-02/RNF-03): PostgreSQL y almacenamiento S3-compatible para Active Storage.
+group :production do
+  gem "pg", "~> 1.5"
+  gem "aws-sdk-s3", require: false
+end
 
 # json 3.x quitó el hash posicional de JSON.parse que usa ActiveSupport 8.1 (rompe columnas JSON).
 gem "json", "~> 2.16"

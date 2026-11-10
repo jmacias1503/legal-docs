@@ -42,10 +42,14 @@ class Document < ApplicationRecord
   def self.filter_by(params)
     scope = all
     if params[:q].present?
-      term = "%#{sanitize_sql_like(params[:q].strip)}%"
-      scope = scope.where("documents.title LIKE :t OR documents.client LIKE :t OR documents.extracted_text LIKE :t", t: term)
+      # Arel `matches` genera ILIKE en PostgreSQL y LIKE en SQLite (ambos sin distinguir mayúsculas).
+      scope = scope.where(
+        contains(:title, params[:q])
+          .or(contains(:client, params[:q]))
+          .or(contains(:extracted_text, params[:q]))
+      )
     end
-    scope = scope.where("documents.client LIKE ?", "%#{sanitize_sql_like(params[:client].strip)}%") if params[:client].present?
+    scope = scope.where(contains(:client, params[:client])) if params[:client].present?
     scope = scope.where(procedure_type: params[:procedure_type]) if params[:procedure_type].present?
     scope = scope.where(status: params[:status]) if params[:status].present? && statuses.key?(params[:status])
     scope = scope.where(created_at: Date.parse(params[:from]).beginning_of_day..) if valid_date?(params[:from])
@@ -59,6 +63,12 @@ class Document < ApplicationRecord
     false
   end
   private_class_method :valid_date?
+
+  # LIKE "contiene" con escape explícito: SQLite no tiene escape por defecto (PostgreSQL usa "\").
+  def self.contains(column, value)
+    arel_table[column].matches("%#{sanitize_sql_like(value.strip)}%", "\\", false)
+  end
+  private_class_method :contains
 
   def status_label = STATUS_LABELS.fetch(status, status.to_s.humanize)
 

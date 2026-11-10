@@ -81,7 +81,9 @@ curl -H "Authorization: Bearer $TOKEN" "http://localhost:3000/api/v1/documents?s
 - Devise (autenticación), Active Storage (archivos), PaperTrail (bitácora)
 - Active Job para OCR y extracción de plantillas
 - Prawn y rqrcode (PDF con QR), rubyzip (Word `.docx`)
-- SQLite en desarrollo y pruebas. El SRS contempla PostgreSQL, almacenamiento tipo S3 y Sidekiq/Redis en producción; las gemas están en el Gemfile pero aún no se configuran.
+- SQLite en desarrollo y pruebas. En producción (RNF-02/RNF-03) ya está configurado PostgreSQL (bases primary, cache, queue y cable), Active Storage sobre S3 o compatible y Solid Queue como backend de Active Job (sin Redis ni Sidekiq).
+- Variables de producción: `RAILS_MASTER_KEY`, `DB_HOST`, `DB_USER`, `DB_NAME` (opcional), `DIGITALLAW_DATABASE_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET` y, para proveedores compatibles, `AWS_S3_ENDPOINT`. Los valores de servidor, registry y dominio en `config/deploy.yml` siguen pendientes (#23).
+- El usuario de PostgreSQL necesita el permiso `CREATEDB`: `db:prepare` crea las bases primary, `_cache`, `_queue` y `_cable`. Si no lo tiene, créalas manualmente antes del primer despliegue.
 - Docker, Kamal y Thruster para el despliegue
 
 ## Instalación
@@ -104,6 +106,8 @@ bin/rails db:prepare
 bin/rails db:seed
 bin/dev
 ```
+
+La gema `pg` está en el grupo `production` y requiere `libpq`. En equipos que no la tengan, instala sin ese grupo: `bundle config set --local without production` (o `BUNDLE_WITHOUT=production bundle install`).
 
 `db:seed` carga la biblioteca legal. La aplicación queda en `http://localhost:3000`; regístrate para crear tu despacho.
 

@@ -11,6 +11,29 @@ test:
   <<: *default
   database: storage/test.sqlite3
 
+# Producción: PostgreSQL (SRS RNF-02/RNF-03). Se configura con las variables
+# DB_HOST, DB_PORT, DB_USER, DB_NAME y DIGITALLAW_DATABASE_PASSWORD.
+# Las bases cache, queue y cable viven en el mismo servidor y se nombran
+# <DB_NAME>_cache, <DB_NAME>_queue y <DB_NAME>_cable (Solid Cache/Queue/Cable).
 production:
-  <<: *default
-  database: storage/production.sqlite3
+  primary: &primary_production
+    adapter: postgresql
+    encoding: unicode
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    host: <%= ENV["DB_HOST"] %>
+    port: <%= ENV.fetch("DB_PORT") { 5432 } %>
+    username: <%= ENV.fetch("DB_USER") { "legal_docs_aps" } %>
+    password: <%= ENV["DIGITALLAW_DATABASE_PASSWORD"] %>
+    database: <%= ENV.fetch("DB_NAME") { "legal_docs_aps_production" } %>
+  cache:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_NAME") { "legal_docs_aps_production" } %>_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_NAME") { "legal_docs_aps_production" } %>_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_NAME") { "legal_docs_aps_production" } %>_cable
+    migrations_paths: db/cable_migrate

@@ -14,8 +14,24 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal 2, firm_docs.filter_by(status: "inexistente", from: "no-es-fecha").count
   end
 
+  test "search is case-insensitive" do
+    firm_docs = firms(:one).documents
+
+    assert_equal [ documents(:lease) ], firm_docs.filter_by(q: "UNIVERSIDAD").to_a
+    assert_equal [ documents(:lease) ], firm_docs.filter_by(q: "universidad").to_a
+  end
+
   test "escapes LIKE wildcards in search" do
-    assert_empty firms(:one).documents.filter_by(q: "%")
+    firm_docs = firms(:one).documents
+    discount = firm_docs.create!(title: "Descuento 10%", user: users(:one))
+    plain = firm_docs.create!(title: "Descuento 10 por ciento", user: users(:one))
+    underscored = firm_docs.create!(title: "Archivo_final", user: users(:one))
+
+    assert_equal [ discount ], firm_docs.filter_by(q: "10%").to_a
+    assert_equal [ discount ], firm_docs.filter_by(q: "%").to_a
+    assert_equal [ underscored ], firm_docs.filter_by(q: "_").to_a
+    assert_empty firm_docs.filter_by(q: "Archivo_fina_")
+    assert_not_includes firm_docs.filter_by(q: "%"), plain
   end
 
   test "exposes document attributes and metadata for autofill" do
