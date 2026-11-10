@@ -8,7 +8,7 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **Estimación de tiempo**
 - **Dependencias** (si aplica)
 
-## Estado al 28 de octubre de 2026
+## Estado al 10 de noviembre de 2026
 
 | Issue | Estado | Dónde |
 | :--- | :--- | :--- |
@@ -28,6 +28,15 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 | #18 Descarga PDF/Word del autollenado | ✅ Hecho | `app/services/document_export.rb` |
 | #19 Bitácora de accesos (RF-06) | ✅ Consultas, descargas, validación y emisión | `Document#log_event!` |
 | #12 – #15 | ⏳ Pendientes según Gantt (noviembre – diciembre) | |
+| #20 Autollenado sobre el Word original (RF-02, RF-05) | ✅ Hecho: llena el .docx original (cuerpo, encabezados, pies, notas), con respaldo al Word genérico si el archivo está dañado o excede límites. Limitación: los marcadores que solo existen en el Word no se pueden mapear en el formulario (solo se listan los del cuerpo) | `app/services/template_filler.rb` |
+| #21 Pruebas de aceptación módulo 2 | ⏳ Pendiente: listo para iniciar (#20 hecho) | `test/` |
+| #22 Configuración de producción (PostgreSQL, S3, Solid Queue) | ✅ Hecho (configuración lista); falta probar contra un PostgreSQL real antes del primer despliegue | `config/`, `db/*_schema.rb` |
+| #23 Kamal: servidor, registro, dominio y host público | ⏳ Bloqueado: faltan servidor, registro y dominio | `config/deploy.yml` |
+| #24 Respaldos automáticos (RNF-05) | ⏳ Pendiente: listo para iniciar (#22 hecho) | |
+| #25 Pasarela de pago y facturación CFDI (RF-04) | ⏳ Pendiente de decisión de negocio/proveedor | |
+| #26 Firma electrónica avanzada FIEL/DocuSign (RF-03) | ⏳ Pendiente de decisión de negocio/proveedor | |
+
+> Nota: la prueba manual del módulo 1 con expedientes reales (#8) la hace el equipo.
 
 ---
 
@@ -157,3 +166,69 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **Prioridad**: Baja
 - **Estimación**: 1 semana
 - **Dependencias**: Issue #14 (Mantenimiento Correctivo).
+
+---
+
+## 7. Mejoras posteriores y producción (Noviembre en adelante)
+
+### Issue #20: Autollenado sobre el Word original
+- **Descripción**: Hoy una plantilla subida en .docx se convierte a texto plano con OCR y se pierde el formato; el PDF/Word exportado es genérico. Nuevo comportamiento: cuando la plantilla tiene un .docx adjunto, los marcadores `{{campo}}` se reemplazan dentro del propio .docx (`word/document.xml`, encabezados y pies de página), incluso si Word los partió en varios fragmentos (runs), conservando el formato. Las plantillas de texto o PDF siguen el flujo de texto plano.
+- **SRS**: RF-02 (Autollenado de Formatos), RF-05 (Gestión de Plantillas)
+- **Prioridad**: Alta
+- **Estimación**: Por definir
+- **Estado**: ✅ Hecho
+- **Entregado**: llena el .docx original (cuerpo, encabezados, pies y notas), con respaldo al Word genérico si el archivo está dañado o excede límites. Limitación conocida: los marcadores que solo existen en el Word no se pueden mapear en el formulario (solo se listan los del cuerpo).
+- **Dependencias**: Ninguna.
+
+### Issue #21: Pruebas de Aceptación del Módulo 2
+- **Descripción**: Continúa el Issue #9 (pruebas unitarias). Escribir pruebas de aceptación del módulo 2: autollenado completo, con datos faltantes e inválidos, mapeos de campos y descargas PDF/Word, incluyendo el Word original.
+- **SRS**: RF-02
+- **Prioridad**: Alta
+- **Estimación**: Por definir
+- **Estado**: ⏳ Pendiente: listo para iniciar
+- **Dependencias**: Issue #20 (Autollenado sobre el Word original), ya hecho.
+
+### Issue #22: Configuración de Producción
+- **Descripción**: Configurar PostgreSQL como base de datos, almacenamiento tipo S3 para Active Storage y Solid Queue como cola de trabajos. Solid Queue funciona sobre PostgreSQL, sin Redis.
+- **SRS**: RNF-02 (Escalabilidad Cloud), RNF-03 (Background Jobs)
+- **Prioridad**: Alta
+- **Estimación**: Por definir
+- **Estado**: ✅ Hecho (configuración lista); falta probar contra un PostgreSQL real antes del primer despliegue.
+- **Pendientes menores**:
+  - Error 500 si el parámetro de búsqueda llega como lista (`?q[]=x`); usar `value.to_s.strip` en `Document.contains`.
+  - Quitar `sqlite3` de la imagen Docker de producción.
+  - Mostrar un mensaje de error claro cuando falta `DB_HOST`.
+  - Probar `db:prepare` contra un PostgreSQL real.
+- **Dependencias**: Ninguna.
+
+### Issue #23: Kamal: Servidor, Registro, Dominio y Host Público
+- **Descripción**: Refina el Issue #10. Definir servidor, registro de imágenes y dominio, y configurar el host público usado en las URLs de los códigos QR de verificación.
+- **SRS**: RNF-02 (Escalabilidad Cloud), RF-03 (Verificación con QR)
+- **Prioridad**: Alta
+- **Estimación**: Por definir
+- **Estado**: ⏳ Bloqueado: faltan servidor, registro de imágenes y dominio.
+- **Dependencias**: Issue #22 (Configuración de producción).
+
+### Issue #24: Respaldos Automáticos
+- **Descripción**: Configurar respaldos automáticos de la base de datos y de los archivos almacenados.
+- **SRS**: RNF-05 (Respaldos)
+- **Prioridad**: Media
+- **Estimación**: Por definir
+- **Estado**: ⏳ Pendiente: listo para iniciar
+- **Dependencias**: Issue #22 (Configuración de producción), ya hecho.
+
+### Issue #25: Pasarela de Pago y Facturación CFDI
+- **Descripción**: Integrar una pasarela de pago y facturación CFDI para las suscripciones (complementa el Issue #11).
+- **SRS**: RF-04 (Sistema de Suscripciones SaaS)
+- **Prioridad**: Media
+- **Estimación**: Por definir
+- **Estado**: ⏳ Pendiente de decisión de negocio/proveedor
+- **Dependencias**: Decisión de negocio y de proveedor.
+
+### Issue #26: Firma Electrónica Avanzada (FIEL/DocuSign)
+- **Descripción**: Integrar firma electrónica avanzada (FIEL o DocuSign) a los documentos emitidos (complementa el Issue #16).
+- **SRS**: RF-03
+- **Prioridad**: Media
+- **Estimación**: Por definir
+- **Estado**: ⏳ Pendiente de decisión de negocio/proveedor
+- **Dependencias**: Decisión de negocio y de proveedor.
