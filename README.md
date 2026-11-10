@@ -129,13 +129,48 @@ bin/rubocop
 bin/brakeman
 ```
 
+## Respaldos y restauración
+
+**Base de datos.** `DatabaseBackupJob` (programado a las 3:00 todos los días en `config/recurring.yml`, solo en producción) ejecuta `pg_dump -Fc` sobre la base primaria (`DB_NAME`) y sube el volcado a S3 como `backups/<DB_NAME>-<AAAAMMDDTHHMMSSZ>.dump`. Las bases `_cache`, `_queue` y `_cable` son desechables y no se respaldan. Si `pg_dump` o la subida fallan, el job lanza un error con el detalle y queda visible en los jobs fallidos de Solid Queue.
+
+Variables: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_NAME`, `DIGITALLAW_DATABASE_PASSWORD` (se pasa a `pg_dump` por `PGPASSWORD`, nunca en la línea de comandos), `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_ENDPOINT` (opcional) y `AWS_S3_BACKUP_BUCKET` (si no está definida se usa `AWS_S3_BUCKET`). `DIGITALLAW_DATABASE_PASSWORD` es obligatoria; si `DB_HOST` está vacía se usa el valor por defecto de libpq. En `config/deploy.yml`, `AWS_S3_BACKUP_BUCKET` tiene el placeholder `PENDIENTE_BUCKET_RESPALDOS`: debe reemplazarse por el bucket real, o borrar/comentar la línea para usar `AWS_S3_BUCKET`, antes de desplegar. `pg_dump` se ejecuta con un entorno limpio (solo `PATH` y las variables `PG*`), sin heredar otros secretos.
+
+**Horario.** El job corre a las 3:00 en la zona horaria de la aplicación; `config.time_zone` no está configurado, por lo que es UTC. Si falla, se reintenta hasta 3 veces en total, con 10 minutos de espera; tras el último intento el error queda en los jobs fallidos de Solid Queue.
+
+**Versión de `pg_dump`.** `pg_dump` y `pg_restore` deben ser de la misma versión mayor que el servidor o más nuevos. El `postgresql-client` de la imagen Docker es el de Debian trixie (PostgreSQL 17), así que el servidor de producción debe ser PostgreSQL 17 o anterior; de lo contrario, instale un cliente de la versión correspondiente.
+
+**Límite de tamaño.** La subida usa una sola operación `put_object`, limitada a 5 GB por objeto. Si los volcados se acercan a ese tamaño, el job debe migrarse a subida multipart.
+
+**Retención.** No se borra nada desde el código. Configure en el bucket una regla de ciclo de vida sobre el prefijo `backups/` (por ejemplo, expirar a los 30 días).
+
+**Archivos subidos (Active Storage).** Viven en S3, que ya replica para durabilidad. Se recomienda activar el versionado del bucket (y una regla de ciclo de vida para versiones no vigentes) para poder recuperar archivos borrados o sobrescritos.
+
+**Restauración.**
+
+```bash
+aws s3 ls s3://$AWS_S3_BACKUP_BUCKET/backups/
+aws s3 cp s3://$AWS_S3_BACKUP_BUCKET/backups/<archivo>.dump .
+PGPASSWORD=... pg_restore --clean --if-exists --no-owner -h $DB_HOST -p ${DB_PORT:-5432} -U $DB_USER -d $DB_NAME <archivo>.dump
+bin/rails db:migrate   # por si el respaldo es de una versión anterior
+```
+
+Detenga la aplicación antes de restaurar sobre la base en uso. El rol que restaura necesita permisos para eliminar y crear objetos (por `--clean`); si no es propietario de los objetos, agregue también `--no-privileges` para omitir los GRANT/REVOKE.
+
+**Probar una restauración** (periódicamente, por ejemplo cada mes, para confirmar que los respaldos son utilizables):
+
+```bash
+createdb tmpdb
+pg_restore --no-owner --no-privileges -d tmpdb <archivo>.dump
+dropdb tmpdb
+```
+
 ## Estructura
 
 ```
 app/
   models/        Document, Template, Firm, User, IssuedDocument, Plan, MonthlyUsage
   services/      OcrExtractor, LegalFields, TemplateFiller, DocumentExport
-  jobs/          DocumentOcrJob, TemplateTextJob
+  jobs/          DocumentOcrJob, TemplateTextJob, DatabaseBackupJob
   controllers/   documents, templates, subscriptions, api_tokens, verifications, api/v1/*
 db/seeds.rb      Biblioteca legal
 public/gantt.html  Cronograma interactivo
@@ -146,4 +181,4 @@ slides/          Presentación de avances (Slidev)
 
 - La gema `json` está fijada en `~> 2.16`: la versión 3.x rompe la lectura de columnas JSON en Rails 8.1.
 - Los QR apuntan a la dirección desde la que se emitió el documento. En producción hay que emitir desde el dominio público definitivo.
-- Pendientes principales: despliegue (servidor, dominio, PostgreSQL, S3 y cola de trabajos), pasarela de pago y facturación CFDI, firma electrónica avanzada (FIEL / DocuSign), y respaldos automáticos (RNF-05).
+- Pendientes principales: despliegue (servidor, dominio, PostgreSQL, S3 y cola de trabajos), pasarela de pago y facturación CFDI, firma electrónica avanzada (FIEL / DocuSign). Los respaldos automáticos (RNF-05) están implementados; falta configurar la regla de ciclo de vida en el bucket.

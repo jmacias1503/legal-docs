@@ -52,6 +52,10 @@ env:
     # Almacenamiento S3 (Active Storage). PENDIENTE (#23): bucket/región reales.
     AWS_REGION: us-east-1
     AWS_S3_BUCKET: PENDIENTE_BUCKET
+    # Respaldos de base de datos (DatabaseBackupJob). PENDIENTE (#23): reemplace
+    # el placeholder por el bucket real o borre/comente la línea antes de
+    # desplegar; solo así se usa AWS_S3_BUCKET como alternativa. DB_NAME es opcional.
+    AWS_S3_BACKUP_BUCKET: PENDIENTE_BUCKET_RESPALDOS
     # AWS_S3_ENDPOINT: https://s3.example.com  # solo para proveedores S3-compatibles
 
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
