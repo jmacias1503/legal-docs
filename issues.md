@@ -20,7 +20,7 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 | #6 Motor de autollenado | ✅ Hecho | `app/services/template_filler.rb` |
 | #7 Validación de datos extraídos | ✅ Hecho | `LegalFields.invalid`, acción "Validar datos" |
 | #8 Pruebas módulo 1 | 🔄 Automatizadas listas; falta prueba manual | `test/controllers/`, `test/models/` |
-| #9 Pruebas módulo 2 | 🔄 Unitarias adelantadas; aceptación en noviembre | `test/services/`, `test/jobs/` |
+| #9 Pruebas módulo 2 | ✅ Hecho (unitarias y de aceptación, ver #21) | `test/services/`, `test/jobs/`, `test/integration/autofill_acceptance_test.rb` |
 | #10 Despliegue con Kamal | ⏳ Pendiente: faltan servidor, registro y dominio | `config/deploy.yml` |
 | #11 Suscripciones SaaS | ✅ Planes, uso mensual y excedente por volumen; falta pasarela de pago | `app/models/plan.rb`, `SubscriptionsController` |
 | #16 Verificación SHA-256 + QR (RF-03) | ✅ Hecho; FIEL/DocuSign pendiente | `IssuedDocument`, `/verificar/:folio` |
