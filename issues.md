@@ -35,8 +35,8 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 | #24 Respaldos automáticos (RNF-05) | ✅ Hecho; faltan pruebas reales contra PostgreSQL y configurar el bucket | `app/jobs/database_backup_job.rb` |
 | #25 Pasarela de pago y facturación CFDI (RF-04) | ⏳ Pendiente de decisión de negocio/proveedor | |
 | #26 Firma electrónica avanzada FIEL/DocuSign (RF-03) | ⏳ Pendiente de decisión de negocio/proveedor | |
-| #27 Límite de tamaño en la verificación pública (RNF-01) | ⏳ Pendiente | `VerificationsController#create` |
-| #28 Datos del cliente en el nombre de la plantilla emitida (RNF-01, LFPDPPP) | ⏳ Pendiente | `/verificar/:token` |
+| #27 Límite de tamaño en la verificación pública (RNF-01) | ✅ Hecho; el tope real de subida queda para el despliegue (#23) | `app/controllers/verifications_controller.rb` |
+| #28 Datos del cliente en el nombre de la plantilla emitida (RNF-01, LFPDPPP) | ✅ Hecho | `app/models/issued_document.rb`, `db/migrate/20261110120000_add_library_template_to_issued_documents.rb` |
 
 > Nota: la prueba manual del módulo 1 con expedientes reales (#8) la hace el equipo.
 
@@ -198,10 +198,10 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **Estimación**: Por definir
 - **Estado**: ✅ Hecho (configuración lista); falta probar contra un PostgreSQL real antes del primer despliegue.
 - **Pendientes menores**:
-  - Error 500 si el parámetro de búsqueda llega como lista (`?q[]=x`); usar `value.to_s.strip` en `Document.contains`.
-  - Quitar `sqlite3` de la imagen Docker de producción.
-  - Mostrar un mensaje de error claro cuando falta `DB_HOST`.
-  - Probar `db:prepare` contra un PostgreSQL real.
+  - ✅ Resuelto: error 500 con parámetros no-texto; `filter_by` ignora los parámetros que no son texto y la API ignora un `page` no numérico.
+  - ✅ Resuelto: se quitó el paquete apt `sqlite3` de la imagen Docker de producción. Si el build o el arranque de la imagen reclama `libsqlite3`, revertir esa línea del Dockerfile (suposición no comprobada con un build real).
+  - ✅ Resuelto: `bin/docker-entrypoint` valida `DB_HOST` y `DIGITALLAW_DATABASE_PASSWORD` y muestra un error claro si faltan.
+  - Abierto: probar `db:prepare` contra un PostgreSQL real.
 - **Dependencias**: Ninguna.
 
 ### Issue #23: Kamal: Servidor, Registro, Dominio y Host Público
@@ -247,7 +247,9 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **SRS**: RNF-01 (Seguridad)
 - **Prioridad**: Media
 - **Estimación**: Por definir
-- **Estado**: ⏳ Pendiente
+- **Estado**: ✅ Hecho; el tope real de subida queda pendiente (ver Pendiente).
+- **Entregado**: `VerificationsController#create` rechaza con 422 los archivos mayores a 10 MB sin leerlos y los parámetros que no son archivo; la lectura del archivo está acotada.
+- **Pendiente**: Rack guarda el cuerpo multipart en disco antes de llegar al controlador (`Rack::MethodOverride` lee los parámetros), así que el tope solo acota lo que la aplicación lee en memoria. Sin `Content-Length` (transferencia por partes) tampoco hay protección temprana. Un tope real requiere un middleware de Rack antes de `Rack::MethodOverride` o un límite en el proxy (no global, porque limitaría la subida de documentos). Definir al resolver el despliegue (#23).
 - **Dependencias**: Ninguna.
 
 ### Issue #28: Datos del Cliente en el Nombre de la Plantilla Emitida
@@ -255,5 +257,6 @@ Este documento lista las tareas pendientes organizadas por fase, alineadas con e
 - **SRS**: RNF-01 (Seguridad), LFPDPPP
 - **Prioridad**: Media
 - **Estimación**: Por definir
-- **Estado**: ⏳ Pendiente
+- **Estado**: ✅ Hecho
+- **Entregado**: `/verificar` muestra el nombre del formato solo si es de la biblioteca legal; si no, "Formato personalizado del despacho". Se guarda en la columna `library_template` de `issued_documents` (migración `20261110120000_add_library_template_to_issued_documents.rb`). Los documentos emitidos antes del cambio muestran el nombre genérico. La página pública sigue mostrando nombre del despacho, fecha y huella (intencional).
 - **Dependencias**: Ninguna.
